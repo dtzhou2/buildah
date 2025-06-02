@@ -6089,10 +6089,8 @@ _EOF
   expect_output --substring 'building at STEP "RUN grep "myhostname" /etc/hosts'
 }
 
-@test "bud with --cgroup-parent" {
-  skip_if_rootless_environment
+@test "bud with --add-host with host-gateway" {
   skip_if_no_runtime
-  skip_if_chroot
 
   _prefetch alpine
 
@@ -6100,23 +6098,35 @@ _EOF
   mkdir -p ${mytmpdir}
   cat > $mytmpdir/Containerfile << _EOF
 from alpine
-run cat /proc/self/cgroup
+run cat /etc/hosts
+_EOF
+
+  run_buildah build --add-host=myhostname:host-gateway -t testbud \
+                  $WITH_POLICY_JSON --file ${mytmpdir}/Containerfile ${mytimedir}
+  expect_output --substring "myhostname"
+}
+
+@test "bud with --cgroup-parent" {
+  skip_if_rootless_environment
+  skip_if_chroot
+
+  _prefetch alpine
+
+  mytmpdir=${TEST_SCRATCH_DIR}/my-dir
+  mkdir -p ${mytmpdir}
+  cat > $mytmpdir/Containerfile << _EOF
+FROM alpine
+RUN .linux.cgroupsPath
 _EOF
 
   # with cgroup-parent
   run_buildah --cgroup-manager cgroupfs build --cgroupns=host --cgroup-parent test-cgroup -t with-flag \
-                  $WITH_POLICY_JSON --file ${mytmpdir}/Containerfile .
-  if is_cgroupsv2; then
-    expect_output --from="${lines[2]}" "0::/test-cgroup"
-  else
-    expect_output --substring "/test-cgroup"
-  fi
+                  --runtime ${DUMPSPEC_BINARY} $WITH_POLICY_JSON --file ${mytmpdir}/Containerfile .
+  expect_output --substring "test-cgroup"
   # without cgroup-parent
   run_buildah --cgroup-manager cgroupfs build -t without-flag \
-                  $WITH_POLICY_JSON --file ${mytmpdir}/Containerfile .
-  if [ -n "$(grep "test-cgroup" <<< "$output")" ]; then
-    die "Unexpected cgroup."
-  fi
+                  --runtime ${DUMPSPEC_BINARY} $WITH_POLICY_JSON --file ${mytmpdir}/Containerfile .
+  assert "$output" !~ test-cgroup
 }
 
 @test "bud with --cpu-period and --cpu-quota" {
@@ -7555,6 +7565,18 @@ EOF
   run find ${TEST_SCRATCH_DIR}/buildcontext -name file-suid -ls
   find ${TEST_SCRATCH_DIR}/buildcontext -ls
   expect_output "" "build should not be able to write to build context"
+}
+
+@test "build-with-two-outputs" {
+  _prefetch busybox
+  mkdir -p "${TEST_SCRATCH_DIR}"/context
+  cat > "${TEST_SCRATCH_DIR}"/context/Containerfile << _EOF
+FROM busybox
+RUN truncate -s1 /built.txt
+_EOF
+  run_buildah build --output type=local,dest=${TEST_SCRATCH_DIR}/output1 --output ${TEST_SCRATCH_DIR}/output2 $WITH_POLICY_JSON "${TEST_SCRATCH_DIR}"/context
+  test -s "${TEST_SCRATCH_DIR}"/output1/built.txt
+  test -s "${TEST_SCRATCH_DIR}"/output2/built.txt
 }
 
 @test "build-with-timestamp-applies-to-oci-archive" {

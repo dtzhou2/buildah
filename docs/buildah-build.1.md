@@ -34,6 +34,12 @@ Add a custom host-to-IP mapping (host:ip)
 
 Add a line to /etc/hosts. The format is hostname:ip. The **--add-host** option can be set multiple times. Conflicts with the --no-hosts option.
 
+Instead of an IP address, the special flag host-gateway can be given. This resolves to an IP address the container can use to connect to the host. The IP address chosen depends on your network setup, thus there's no guarantee that Buildah can determine the host-gateway address automatically, which will then cause Buildah to fail with an error message. You can overwrite this IP address using the host_containers_internal_ip option in containers.conf.
+
+The host-gateway address is also used by Buildah to automatically add the host.containers.internal and host.docker.internal hostnames to /etc/hosts. You can prevent that by either giving the --no-hosts option, or by setting host_containers_internal_ip="none" in containers.conf. If no host-gateway address was configured manually and Buildah fails to determine the IP address automatically, Buildah will silently skip adding these internal hostnames to /etc/hosts. If Buildah is running in a virtual machine using podman machine (this includes Mac and Windows hosts), Buildah will silently skip adding the internal hostnames to /etc/hosts, unless an IP address was configured manually; the internal hostnames are resolved by the gvproxy DNS resolver instead.
+
+Buildah will use the /etc/hosts file of the host as a basis by default, i.e. any hostname present in this file will also be present in the /etc/hosts file of the container. A different base file can be configured using the base_hosts_file config in containers.conf
+
 **--all-platforms**
 
 Instead of building for a set of platforms specified using the **--platform** option, inspect the build's base images, and build for all of the platforms for which they are all available.  Stages that use *scratch* as a starting point can not be inspected, so at least one non-*scratch* stage must be present for detection to work usefully.
@@ -189,7 +195,7 @@ The default certificates directory is _/etc/containers/certs.d_.
 
 **--cgroup-parent**=""
 
-Path to cgroups under which the cgroup for the container will be created. If the path is not absolute, the path is considered to be relative to the cgroups path of the init process. Cgroups will be created if they do not already exist.
+Path to cgroups under which the cgroup for RUN instructions will be created. If the path is not absolute, the path is considered to be relative to the cgroups path of the init process. Cgroups will be created if they do not already exist.
 
 **--cgroupns** *how*
 
@@ -948,7 +954,7 @@ Security Options
   "seccomp=profile.json   : JSON configuration for a seccomp filter
 
   "unmask=_ALL_ or _/path/1:/path/2_, or shell expanded paths (/proc/*): Paths to unmask separated by a colon. If set to **ALL**, it unmasks all the paths that are masked or made read-only by default.
-  The default masked paths are **/proc/acpi, /proc/kcore, /proc/keys, /proc/latency_stats, /proc/sched_debug, /proc/scsi, /proc/timer_list, /proc/timer_stats, /sys/firmware, and /sys/fs/selinux**, **/sys/devices/virtual/powercap**.  The default paths that are read-only are **/proc/asound**, **/proc/bus**, **/proc/fs**, **/proc/irq**, **/proc/sys**, **/proc/sysrq-trigger**, **/sys/fs/cgroup**.
+  The default masked paths are **/proc/acpi, /proc/interrupts, /proc/kcore, /proc/keys, /proc/latency_stats, /proc/sched_debug, /proc/scsi, /proc/timer_list, /proc/timer_stats, /sys/devices/virtual/powercap, /sys/firmware**, and **/sys/fs/selinux**.  The default paths that are read-only are **/proc/asound**, **/proc/bus**, **/proc/fs**, **/proc/irq**, **/proc/sys**, and **/proc/sysrq-trigger**.
 
 **--shm-size**=""
 
