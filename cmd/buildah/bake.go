@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	// "fmt"
 	// "os"
 	"github.com/containers/buildah/imagebuildah"
 	buildahcli "github.com/containers/buildah/pkg/cli"
@@ -39,7 +39,7 @@ func init() {
 	flags.SetInterspersed(false)
 
 	// build is a all common flags
-	flags.StringVarP(&opts.files, "files", "f", "docker-bake.hcl", "specifies filepath of bakefile")
+	flags.StringVarP(&opts.files, "files", "f", "compose.yaml", "specifies filepath of bakefile")
 	flags.BoolVar(&opts.print, "print", false, "pretty prints specified bakefile")
 
 	rootCmd.AddCommand(bakeCommand)
@@ -51,10 +51,13 @@ func bakeCmd(c *cobra.Command, inputArgs []string, opts bakeOptions) error {
 	if err := buildahcli.VerifyFlagsArgsOrder(inputArgs); err != nil {
 		return err
 	}
+	
+	store, err := getStore(c)
+	if err != nil {
+		return err
+	}
 
-	fmt.Printf("%s\n", opts.files)
-
-	imagebuildah.bakeFiles(opts.files, opts.print);
+	imagebuildah.BakeFiles(getContext(), store, opts.files, opts.print, inputArgs...);
 
 	return err
 }

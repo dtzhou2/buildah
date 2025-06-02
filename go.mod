@@ -19,6 +19,7 @@ require (
 	github.com/docker/go-units v0.5.0
 	github.com/fsouza/go-dockerclient v1.12.0
 	github.com/hashicorp/go-multierror v1.1.1
+	github.com/hashicorp/hcl/v2 v2.23.0
 	github.com/mattn/go-shellwords v1.0.12
 	github.com/moby/buildkit v0.22.0
 	github.com/moby/sys/capability v0.4.0
@@ -54,6 +55,9 @@ require (
 	github.com/VividCortex/ewma v1.2.0 // indirect
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d // indirect
 	github.com/aead/serpent v0.0.0-20160714141033-fba169763ea6 // indirect
+	github.com/agext/levenshtein v1.2.3 // indirect
+	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
+	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/chzyer/readline v1.5.1 // indirect
 	github.com/containerd/cgroups/v3 v3.0.5 // indirect
@@ -89,6 +93,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
+	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/go-containerregistry v0.20.3 // indirect
 	github.com/google/go-intervals v0.0.2 // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -107,6 +112,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.27 // indirect
 	github.com/miekg/pkcs11 v1.1.1 // indirect
 	github.com/mistifyio/go-zfs/v3 v3.0.1 // indirect
+	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/moby/go-archive v0.1.0 // indirect
@@ -141,6 +147,7 @@ require (
 	github.com/vbauerster/mpb/v8 v8.9.3 // indirect
 	github.com/vishvananda/netlink v1.3.1-0.20240922070040-084abd93d350 // indirect
 	github.com/vishvananda/netns v0.0.5 // indirect
+	github.com/zclconf/go-cty v1.13.0 // indirect
 	go.mongodb.org/mongo-driver v1.14.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
